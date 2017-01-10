@@ -1,0 +1,40 @@
+.pull-requests{
+
+  .author small {
+    position: relative;
+    top: -15px;
+    left: 10px;
+    font-size: 12px;
+  }
+
+  @media (min-width: 1300px) {
+
+    .author {
+      width: 100px;
+    }
+
+    .num {
+      width: 30px;
+    }
+
+    .type,
+    .status {
+      width: 50px;
+    }
+
+    .title {
+      width: 300px;
+    }
+    
+    .repository{
+      width: 120px;
+    }
+
+    .actions {
+      width: 130px;
+    }
+
+  }
+
+
+}
