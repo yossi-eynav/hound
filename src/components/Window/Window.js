@@ -6,6 +6,7 @@ import PullRequest from '../Tabs/PullRequest/PullRequest'
 import Commits from '../Tabs/Commits/Commits'
 import Snackbar from 'material-ui/Snackbar';
 import TokenDialog from '../TokenDialog/TokenDialog'
+import OrgDialog from '../OrgDialog/OrgDialog'
 import './Window.scss';
 
 
@@ -41,7 +42,7 @@ class Window extends React.Component {
             getRepositories,
             getPullRequests, 
             pullRequests
-            } = this.props;
+        } = this.props;
 
         switch (menuSelectedOption) {
             case 'search':
@@ -72,7 +73,11 @@ class Window extends React.Component {
             saveAccessToken,
             accessToken,
             users,
-            repositories
+            repositories,
+            selectedOrg,
+            orgs,
+            getOrgs,
+            selectOrg
         } = this.props;
 
         return (
@@ -83,7 +88,8 @@ class Window extends React.Component {
                 {this.content()}
             </div>
             <Snackbar open={fetching} message="Fetching Data From Server." />
-                {!accessToken && <TokenDialog fetchUsers={fetchUsers}  getRepositories={getRepositories} saveAccessToken={saveAccessToken} />}
+                {!accessToken &&  <TokenDialog getOrgs={getOrgs} saveAccessToken={saveAccessToken} /> }
+                {(accessToken && !selectedOrg) &&  <OrgDialog orgs={orgs} selectOrg={selectOrg} fetchUsers={fetchUsers} getRepositories={getRepositories}  /> }
             </div>
         )
 

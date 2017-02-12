@@ -17,7 +17,9 @@ const mapStateToProps = (state, ownProps) => {
     pullRequests: state.get('pullRequests'),
     repositories: state.get('repositories'),
     commits: state.get('commits'),
-    filters: state.get('filters')
+    filters: state.get('filters'),
+    orgs: state.get('orgs'),
+    selectedOrg: state.get('selectedOrg')
     }
 };
 

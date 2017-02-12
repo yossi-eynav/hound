@@ -1,6 +1,29 @@
 import * as actionTypes from './actionTypes'
 import moment from 'moment';
 
+const getOrgs = () => {
+  return (dispatch, getState) => {
+      dispatch(startFetching());
+      const token = getState().get('accessToken');
+      if(!token) {return; }
+
+    fetch(`https://api.github.com/user/orgs?access_token=${token}`)
+    .then((response) => response.json())
+        .then((orgs) => {
+            dispatch(endFetching());
+            dispatch({type: actionTypes.FETCHED_ORGS, orgs})
+        });
+  }
+};
+
+
+const selectOrg = (org) => {
+    return {
+        type: actionTypes.ORG_SELECTED,
+        org
+    }
+}
+
 const startFetching = () => {
     return {
         type: actionTypes.FETCHING_STARTED
@@ -15,9 +38,13 @@ const endFetching = () => {
 
 const searchCode = (query) => {
   return (dispatch, getState) => {
-      dispatch(startFetching());
-    const token = getState().get('accessToken');
-    return githubFetching(`https://api.github.com/search/code?q=${query}+org:fiverr&access_token=${token}&per_page=100`,[],{
+    dispatch(startFetching());
+    const state = getState();
+    const token = state.get('accessToken');
+    const org = state.get('selectedOrg');
+    if (!token || !org ) { return; }
+
+    return githubFetching(`https://api.github.com/search/code?q=${query}+org:${org}&access_token=${token}&per_page=100`,[],{
           'Accept': 'application/vnd.github.v3.text-match+json'
         })
         .then(response => {
@@ -38,12 +65,7 @@ const searchCode = (query) => {
             });
 
             dispatch(endFetching());
-          dispatch(
-              {
-                type: actionTypes.FETCHED_CODE_SEARCH,
-                codeMatches: entites
-              }
-          );
+            dispatch( { type: actionTypes.FETCHED_CODE_SEARCH, codeMatches: entites } );
         })
   }
 };
@@ -59,10 +81,12 @@ function getNextPaginationLink(response) {
 function getRepositories() {
     const date = moment().add(-1, 'months').format('YYYY-MM-DD');
     return (dispatch, getState) => {
-        const token = getState().get('accessToken');
-        if(!token) {return; }
+        const state = getState();
+        const token = state.get('accessToken');
+        const org = state.get('selectedOrg');
+        if (!token || !org ) { return; }
 
-        return githubFetching(`https://api.github.com/search/repositories?q=+org:fiverr+pushed:>${date}&access_token=${token}&per_page=100`)
+        return githubFetching(`https://api.github.com/search/repositories?q=+org:${org}+pushed:>${date}&access_token=${token}&per_page=100`)
             .then(response => {
                 let repositories = response.map((item) =>item.items)
                     .reduce((a,b) => a.concat(b));
@@ -81,14 +105,15 @@ const getPullRequests = (pullRequestState = 'all') => {
         dispatch(startFetching());
         const state = getState();
         const token = state.get('accessToken');
-        if(!token) {return; }
+        const org = state.get('selectedOrg');
+        if (!token || !org ) { return; }
 
         let repositories = [];
             new Promise(() => {
                 repositories = state.get('repositories');
                 Promise.all(repositories.map((repository) => {
 
-                    return fetch(`https://api.github.com/repos/fiverr/${repository.name}/pulls?access_token=${token}&per_page=100&state=${pullRequestState}`)
+                    return fetch(`https://api.github.com/repos/${org}/${repository.name}/pulls?access_token=${token}&per_page=100&state=${pullRequestState}`)
                         .then((response) => response.json())
                 }))
                 .then((pullRequests) => {
@@ -142,13 +167,14 @@ const getCommits = (since = moment().add(-10,'days').format()) => {
         dispatch(startFetching());
         const state = getState();
         const token = state.get('accessToken');
-        if(!token) {return; }
+        const org = state.get('selectedOrg');
+        if (!token || !org ) { return; }
 
         let repositories = [];
         new Promise(() => {
             repositories = state.get('repositories');
             Promise.all(repositories.map((repository) => {
-                return githubFetching(`https://api.github.com/repos/fiverr/${repository.name}/commits?since=${since}&access_token=${token}&per_page=100`)
+                return githubFetching(`https://api.github.com/repos/${org}/${repository.name}/commits?since=${since}&access_token=${token}&per_page=100`)
                     .then((response) => {
                         const commits = response.reduce((a,b) => a.concat(b));
                         return commits.map(commit => {
@@ -196,10 +222,12 @@ const setMenuOption = (option) => {
 const fetchUsers = () => {
   return (dispatch, getState) => {
       dispatch(startFetching());
-      const token = getState().get('accessToken');
-      if(!token) {return; }
+      const state = getState();
+      const token = state.get('accessToken');
+      const org = state.get('selectedOrg');
+      if (!token || !org ) { return; }
 
-    githubFetching(`https://api.github.com/orgs/fiverr/members?per_page=100&access_token=${token}`)
+    githubFetching(`https://api.github.com/orgs/${org}/members?per_page=100&access_token=${token}`)
     .then((response) => response.reduce((a,b) => a.concat(b)))
         .then((users) => {
             dispatch(endFetching());
@@ -211,8 +239,12 @@ const fetchUsers = () => {
 const getInvolvement = (userName) => {
   return (dispatch, getState) => {
       dispatch(startFetching());
-      const token = getState().get('accessToken');
-    return fetch(`https://api.github.com/search/issues?q=+org:fiverr+involves:${userName}&access_token=${token}&per_page=100`)
+      const state = getState();
+      const token = state.get('accessToken');
+      const org = state.get('selectedOrg');
+      if (!token || !org ) { return; }
+
+    return fetch(`https://api.github.com/search/issues?q=+org:${org}+involves:${userName}&access_token=${token}&per_page=100`)
         .then((response) => response.json())
         .then(json => {
             const involves =  json.items.map(involve => {
@@ -228,9 +260,12 @@ const getInvolvement = (userName) => {
 
 const fetchReviews = (repo, pullRequestNumber) => {
   return (dispatch, getState) => {
-      const token = getState().get('accessToken');
+        const state = getState();
+        const token = state.get('accessToken');
+        const org = state.get('selectedOrg');
+        if (!token || !org ) { return; }
 
-        return fetch(`https://api.github.com/repos/fiverr/${repo}/pulls/${pullRequestNumber}/reviews?access_token=${token}&per_page=100`,{
+        return fetch(`https://api.github.com/repos/${org}/${repo}/pulls/${pullRequestNumber}/reviews?access_token=${token}&per_page=100`,{
             headers: {
                 'Accept': 'application/vnd.github.black-cat-preview+json'
             }
@@ -251,6 +286,8 @@ const fetchReviews = (repo, pullRequestNumber) => {
 };
 
 export {
+    selectOrg,
+    getOrgs,
     searchCode,
     getPullRequests,
     saveAccessToken,

@@ -9,18 +9,16 @@ class TokenDialog extends React.Component {
 
 
     saveBtnHandler() {
-        const {saveAccessToken, fetchUsers, getRepositories} = this.props;
+        const {saveAccessToken, getOrgs} = this.props;
         const token = this.refs.token.getValue();
         if (!token) { return;}
         
         localStorage.setItem('accessToken', token);
-        saveAccessToken(token)
-        fetchUsers();
-        getRepositories();
+        saveAccessToken(token);
+        getOrgs();
     }
 
     render() {
-
 
        return (<div>
 
@@ -34,7 +32,7 @@ class TokenDialog extends React.Component {
                 <TextField type="password"
                             name="token"
                             ref="token"
-                                placeholder={'Paste your access key'} />
+                            placeholder={'Paste your access key'} />
                 </Dialog>
 
 
