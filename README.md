@@ -14,6 +14,9 @@ Hound is a tool that offers an alternative way to visualise your organisation Gi
  4. Commits Backlog:
     * See the organisation commits backlog.
 
+## Live Demo:
+https://yossi-eynav.github.io/hound/
+
 ## Screenshots:
 <img width="1435" alt="screen shot 2017-02-13 at 1 40 38" src="https://cloud.githubusercontent.com/assets/8016250/22867301/6ea99346-f18e-11e6-9dd1-f32810736e3d.png">
 <img width="1434" alt="screen shot 2017-02-13 at 1 41 10" src="https://cloud.githubusercontent.com/assets/8016250/22867302/6eb2490a-f18e-11e6-9fa4-54f69b30cdd5.png">
