@@ -1,21 +1,22 @@
 import React from 'react';
 import './commits.scss';
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import Avatar from 'material-ui/Avatar';
 import moment from 'moment';
 import DatePicker from 'material-ui/DatePicker';
+import FlatButton from 'material-ui/FlatButton';
+import { Table, Column, Cell } from 'fixed-data-table';
+import 'fixed-data-table/dist/fixed-data-table.css';
 
 
-
-class Commits extends  React.Component {
+class Commits extends React.Component {
 
     getCommits() {
         let since = this.state.since,
             until = this.state.until;
-            if (since) { since = since.toISOString() }
-            if (until) { until = until.toISOString() }
+        if (since) { since = since.toISOString() }
+        if (until) { until = until.toISOString() }
 
-        this.props.getCommits(since,until);
+        this.props.getCommits(since, until);
     }
 
     componentDidMount() {
@@ -33,57 +34,80 @@ class Commits extends  React.Component {
         return (
             <div className="commits">
                 <h1> Commits</h1>
-                    <DatePicker hintText="Since:" container="inline" onChange={function(event, date) {
-                            this.setState({since: date});
-                    }.bind(this)}/>
-                    <DatePicker hintText="Until:" container="inline" onChange={function(event, date) {
-                            this.setState({until: date});
-                    }.bind(this)}/>
-                <button onClick={this.getCommits.bind(this)}>FETCH </button>
-                <Table>
-                    <TableHeader displaySelectAll={false} adjustForCheckbox={false} displayRowCheckbox={false}>
-                        <TableRow>
-                            <TableHeaderColumn className="num">Num</TableHeaderColumn>
-                            <TableHeaderColumn>Title</TableHeaderColumn>
-                            <TableHeaderColumn>Author</TableHeaderColumn>
-                            <TableHeaderColumn>Repository</TableHeaderColumn>
-                            <TableHeaderColumn>Relative Updated At</TableHeaderColumn>
-                            <TableHeaderColumn>ISO Updated At</TableHeaderColumn>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody displayRowCheckbox={false} showRowHover={true}>
-                        {commits.map((item, index) => {
-                            let date = moment(item.commit.committer.date);
-                    
-        
-                            return (<TableRow key={item.id}>
-                                <TableRowColumn className="num">{index + 1}</TableRowColumn>
-                                <TableRowColumn>
-                                    <a href={item.html_url} target="_blank">{item.commit.message}</a>
-                                    </TableRowColumn>
-                                <TableRowColumn>
-                                    <Avatar src={item.author && item.author.avatar_url} />
-                                    <small>{item.author && item.author.login}</small>
-                                </TableRowColumn>
-                                <TableRowColumn>
-                                    { item.repository.name }
-                                </TableRowColumn>
-                                <TableRowColumn className="updated-at">
-                                    { date.fromNow() }
-                                </TableRowColumn>
-                                   <TableRowColumn className="updated-at">
-                                    { date.format('YYYY-MM-DD, HH:MM:SS') }
-                                </TableRowColumn>
+                <form>
+                    <DatePicker className="input" hintText="Since:" container="inline" onChange={function (event, date) {
+                        this.setState({ since: date });
+                    }.bind(this)} />
+                    <DatePicker className="input" hintText="Until:" container="inline" onChange={function (event, date) {
+                        this.setState({ until: date });
+                    }.bind(this)} />
+                    <FlatButton className="input" onClick={this.getCommits.bind(this)} label="FETCH" />
+                </form>
+                <div className="container-commits">
+                    <Table
+                        rowHeight={50}
+                        rowsCount={commits.count()}
+                        width={1450}
+                        height={1000}
+                        headerHeight={50}>
 
-                            </TableRow>)
-                        })}
+                        <Column
+                            header={<Cell>Num</Cell>}
+                            width={50}
+                            cell={({rowIndex, props}) => (
+                                <Cell {...props}>
+                                    {rowIndex}
+                                </Cell> )} />
 
-                    </TableBody>
-                </Table>
+                        <Column
+                            header={<Cell>Message</Cell>}
+                            width={600}
+                            cell={({rowIndex, props}) => (
+                                <Cell {...props}>
+                                    <a href={commits.getIn([rowIndex, 'html_url'])} target="_blank">{commits.getIn([rowIndex, 'commit', 'message'])}</a>
+                                </Cell> )} />
+
+                        <Column
+                            header={<Cell>Author</Cell>}
+                            width={200}
+                            cell={({rowIndex, props}) => (
+                                <Cell {...props}>
+                                    <Avatar src={commits.getIn([rowIndex, 'committer', 'avatar_url'])} />
+                                    <small> {commits.getIn([rowIndex, 'committer', 'login'])}  </small>
+                                </Cell> )} />
+
+
+                        <Column
+                            header={<Cell>Repository Name</Cell>}
+                            width={200}
+                            cell={({rowIndex, props}) => (
+                                <Cell {...props}>
+                                    {commits.getIn([rowIndex, 'repository', 'name'])}
+                                </Cell>)} />
+
+                        <Column
+                            header={<Cell>Updated At</Cell>}
+                            width={200}
+                            cell={({rowIndex, props}) => (
+                                <Cell {...props}>
+                                    {moment(commits.getIn([rowIndex, 'commit', 'committer', 'date'])).fromNow()}
+                                </Cell>
+                            )} />
+
+                        <Column
+                            header={<Cell>Updated At</Cell>}
+                            width={200}
+                            cell={({rowIndex, props}) => (
+                                <Cell {...props}>
+                                    {moment(commits.getIn([rowIndex, 'commit', 'committer', 'date'])).format('YYYY-MM-DD HH:MM:SS')}
+                                </Cell>
+                            )} />
+                    </Table>
+                </div>
             </div>
         )
     }
 
 }
 
-export default  Commits;
+export default Commits;

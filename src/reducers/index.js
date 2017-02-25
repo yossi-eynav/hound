@@ -13,7 +13,7 @@ const initialState = Immutable.Map()
                               .set('pullRequests', [])
                               .set('repositories', [])
                               .set('codeMatches', [])
-                              .set('commits', [])
+                              .set('commits',  new Immutable.List())
                               .set('orgs', [])
                               .set('fetching', false)
                               .set('filters', new Immutable.Map());
@@ -49,7 +49,7 @@ const reducers = (state = initialState , action) => {
       return state.set('repositories', action.repositories);
       
     case actionTypes.FETCHED_COMMITS:
-      return state.set('commits', action.commits);
+      return state.set('commits', Immutable.fromJS(action.commits));
       
     case actionTypes.NEW_FILTER:
     return state.update('filters',(map) => map.set(action.filter, action.value));
