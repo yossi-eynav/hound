@@ -162,7 +162,7 @@ const clearFilters = () => {
     }
 };
 
-const getCommits = (since = moment().add(-10,'days').format()) => {
+const getCommits = (since = moment().add(-10,'days').format(), until = moment().format()) => {
     return (dispatch, getState) => {
         dispatch(startFetching());
         const state = getState();
@@ -174,7 +174,7 @@ const getCommits = (since = moment().add(-10,'days').format()) => {
         new Promise(() => {
             repositories = state.get('repositories');
             Promise.all(repositories.map((repository) => {
-                return githubFetching(`https://api.github.com/repos/${org}/${repository.name}/commits?since=${since}&access_token=${token}&per_page=100`)
+                return githubFetching(`https://api.github.com/repos/${org}/${repository.name}/commits?since=${since}&until=${until}&access_token=${token}&per_page=100`)
                     .then((response) => {
                         const commits = response.reduce((a,b) => a.concat(b));
                         return commits.map(commit => {

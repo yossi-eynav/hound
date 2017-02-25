@@ -3,26 +3,43 @@ import './commits.scss';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import Avatar from 'material-ui/Avatar';
 import moment from 'moment';
+import DatePicker from 'material-ui/DatePicker';
 
 
 
 class Commits extends  React.Component {
 
+    getCommits() {
+        let since = this.state.since,
+            until = this.state.until;
+            if (since) { since = since.toISOString() }
+            if (until) { until = until.toISOString() }
+
+        this.props.getCommits(since,until);
+    }
+
     componentDidMount() {
-        this.props.getCommits();
+        this.getCommits();
     }
 
     constructor(props) {
         super(props);
+        this.state = {}
     }
 
     render() {
         let { commits } = this.props;
 
-
         return (
             <div className="commits">
                 <h1> Commits</h1>
+                    <DatePicker hintText="Since:" container="inline" onChange={function(event, date) {
+                            this.setState({since: date});
+                    }.bind(this)}/>
+                    <DatePicker hintText="Until:" container="inline" onChange={function(event, date) {
+                            this.setState({until: date});
+                    }.bind(this)}/>
+                <button onClick={this.getCommits.bind(this)}>FETCH </button>
                 <Table>
                     <TableHeader displaySelectAll={false} adjustForCheckbox={false} displayRowCheckbox={false}>
                         <TableRow>
@@ -36,7 +53,7 @@ class Commits extends  React.Component {
                     </TableHeader>
                     <TableBody displayRowCheckbox={false} showRowHover={true}>
                         {commits.map((item, index) => {
-                            let date = moment(item.commit.author.date);
+                            let date = moment(item.commit.committer.date);
                     
         
                             return (<TableRow key={item.id}>
