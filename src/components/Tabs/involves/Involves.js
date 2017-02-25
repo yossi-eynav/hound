@@ -2,7 +2,7 @@ import React from 'react';
 import './involves.scss';
 import AutoComplete from 'material-ui/AutoComplete';
 import FlatButton from 'material-ui/FlatButton';
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+import { Table, Column, Cell } from 'fixed-data-table';
 import Avatar from 'material-ui/Avatar';
 import FontIcon from 'material-ui/FontIcon';
 import SelectField from 'material-ui/SelectField';
@@ -14,27 +14,27 @@ import Filters from '../../Filters/Filters'
 
 
 
-class Involves extends  React.Component {
+class Involves extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {filters: {}}
+        this.state = { filters: {} }
 
     }
 
     setFilter(key, value) {
         const filters = this.state.filters;
         filters[key] = value;
-        this.setState({filters});
+        this.setState({ filters });
     }
 
     render() {
-        let {users, getInvolvement,clearFilters,involves, filters, repositories, setFilter} = this.props;
+        let {users, getInvolvement, clearFilters, involves, filters, repositories, setFilter} = this.props;
 
         involves = involves.filter(involve => {
-            return involve.repositoryName.match(new RegExp(filters.get('repository'))) &&
-            involve.user.login.match(new RegExp(filters.get('author'))) &&
-            involve.state.match(new RegExp(filters.get('state')));
+            return involve.get('repositoryName').match(new RegExp(filters.get('repository'))) &&
+                involve.getIn(['user','login']).match(new RegExp(filters.get('author'))) &&
+                involve.get('state').match(new RegExp(filters.get('state')));
         });
 
 
@@ -47,69 +47,95 @@ class Involves extends  React.Component {
                         hintText="Search Fiverr's organization members"
                         ref="user_search"
                         fullWidth={true}
-                        style={{width: '500px'}}
-                        dataSource={ users.map(user => user.login)}
-                        filter={ (query, key) => key.match(new RegExp(query ,'gi'))}
+                        style={{ width: '500px' }}
+                        dataSource={users.map(user => user.login)}
+                        filter={(query, key) => key.match(new RegExp(query, 'gi'))}
                         maxSearchResults={10}
                         onNewRequest={(val) => getInvolvement(val)}
                     />
                 </div>
                 <Filters clearFilters={clearFilters} users={users} filters={filters} repositories={repositories} setFilter={setFilter} />
-                
-                <Table>
-                    <TableHeader displaySelectAll={false} adjustForCheckbox={false} displayRowCheckbox={false}>
-                        <TableRow>
-                            <TableHeaderColumn className="num">Num</TableHeaderColumn>
-                            <TableHeaderColumn className="title">Title</TableHeaderColumn>
-                            <TableHeaderColumn className="author">Author</TableHeaderColumn>
-                            <TableHeaderColumn>Repository</TableHeaderColumn>
-                            <TableHeaderColumn>Type</TableHeaderColumn>
-                            <TableHeaderColumn>Status</TableHeaderColumn>
-                            <TableHeaderColumn>Updated At</TableHeaderColumn>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody displayRowCheckbox={false} showRowHover={true}>
-                        {involves.map((involve, index) => {
-                            return (<TableRow key={involve.id}>
-                                <TableRowColumn className="num">{index + 1}</TableRowColumn>
-                                <TableRowColumn className="title">
-                                    <a href={involve.html_url} target="_blank">{involve.title}</a>
-                                    </TableRowColumn>
-                                <TableRowColumn className="author">
-                                    <Avatar src={involve.user.avatar_url} />
-                                    <small>{involve.user.login}</small>
-                                </TableRowColumn>
 
-                                <TableRowColumn>
-                                    { involve.repositoryName }
-                                </TableRowColumn>
+                <div className="container-involves">
+                    <Table
+                        rowHeight={50}
+                        rowsCount={involves.count()}
+                        width={1450}
+                        height={1000}
+                        headerHeight={50}>
 
-                                <TableRowColumn className="type">
-                                    { involve.pull_request ?
-                                        <FontIcon className="material-icons">code</FontIcon> :
-                                        <FontIcon className="material-icons">info</FontIcon>
-                                    }
-                                </TableRowColumn>
+                        <Column
+                            header={<Cell>Num</Cell>}
+                            width={50}
+                            cell={({rowIndex, props}) => (
+                                <Cell {...props}>
+                                    {rowIndex}
+                                </Cell>)} />
 
-                                <TableRowColumn className="type">
-                                    { involve.state === 'open' ?
-                                        <FontIcon className="material-icons" style={{color:'green'}}>lock_open</FontIcon> :
-                                        <FontIcon className="material-icons" style={{color:'red'}}>lock_outline</FontIcon>
-                                    }
-                                </TableRowColumn>
+                        <Column
+                            header={<Cell>Title</Cell>}
+                            width={600}
+                            cell={({rowIndex, props}) => (
+                                <Cell {...props}>
+                                    <a href={involves.getIn([rowIndex, 'html_url'])} target="_blank">{involves.getIn([rowIndex, 'title'])}</a>
+                                </Cell>)} />
 
-                                <TableRowColumn className="updated-at">
-                                    {moment(involve.updated_at).fromNow()}
-                                </TableRowColumn>
-                            </TableRow>)
-                        })}
+                        <Column
+                            header={<Cell>Author</Cell>}
+                            width={200}
+                            cell={({rowIndex, props}) => (
+                                <Cell {...props}>
+                                    <Avatar src={involves.getIn([rowIndex, 'user', 'avatar_url'])} />
+                                    <small> {involves.getIn([rowIndex, 'user', 'login'])}  </small>
+                                </Cell>)} />
 
-                    </TableBody>
-                </Table>
+
+                        <Column
+                            header={<Cell>Repository Name</Cell>}
+                            width={200}
+                            cell={({rowIndex, props}) => (
+                                <Cell {...props}>
+                                    {involves.getIn([rowIndex, 'repositoryName'])}
+                                </Cell>)} />
+
+                        <Column
+                            header={<Cell>Type</Cell>}
+                            width={200}
+                            cell={({rowIndex, props}) => (
+                                <Cell {...props}>
+                                        {involves.getIn([rowIndex, 'pull_request']) ? 
+                                                 <FontIcon className="material-icons">code</FontIcon> :
+                                                <FontIcon className="material-icons">info</FontIcon>
+                                         }
+                                </Cell>
+                            )} />
+
+                        <Column
+                            header={<Cell>Status</Cell>}
+                            width={200}
+                            cell={({rowIndex, props}) => (
+                                <Cell {...props}>
+                                 {involves.getIn([rowIndex, 'state']) === 'open' ? 
+                                                  <FontIcon className="material-icons" style={{ color: 'green' }}>lock_open</FontIcon> :
+                                        <FontIcon className="material-icons" style={{ color: 'red' }}>lock_outline</FontIcon>
+                                         }
+                                </Cell>
+                            )} />
+
+   <Column
+                            header={<Cell>Updated At</Cell>}
+                            width={200}
+                            cell={({rowIndex, props}) => (
+                                <Cell {...props}>
+                                    {moment(involves.getIn([rowIndex, 'updated_at'])).fromNow()}
+                                </Cell>
+                            )} />
+                    </Table>
+                </div>
             </div>
-     )
+        )
     }
 
 }
 
-export default  Involves;
+export default Involves;

@@ -9,7 +9,7 @@ const initialState = Immutable.Map()
                               .set('accessToken', selectedOrg && accessToken)
                               .set('selectedOrg', accessToken && selectedOrg)
                               .set('users', [])
-                              .set('involves', [])
+                              .set('involves', new Immutable.List())
                               .set('pullRequests', [])
                               .set('repositories', [])
                               .set('codeMatches', [])
@@ -40,7 +40,7 @@ const reducers = (state = initialState , action) => {
       return state.set('fetching', false);
 
     case actionTypes.FETCHED_INVOLVES:
-      return state.set('involves', action.involves);
+      return state.set('involves', Immutable.fromJS(action.involves));
 
     case actionTypes.FETCHED_PRs:
       return state.set('pullRequests', action.pullRequests);
