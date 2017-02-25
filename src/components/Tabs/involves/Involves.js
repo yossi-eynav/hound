@@ -60,7 +60,7 @@ class Involves extends React.Component {
                     <Table
                         rowHeight={50}
                         rowsCount={involves.count()}
-                        width={1450}
+                        width={1750}
                         height={1000}
                         headerHeight={50}>
 
@@ -74,7 +74,7 @@ class Involves extends React.Component {
 
                         <Column
                             header={<Cell>Title</Cell>}
-                            width={600}
+                            width={700}
                             cell={({rowIndex, props}) => (
                                 <Cell {...props}>
                                     <a href={involves.getIn([rowIndex, 'html_url'])} target="_blank">{involves.getIn([rowIndex, 'title'])}</a>
