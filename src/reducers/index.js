@@ -10,7 +10,7 @@ const initialState = Immutable.Map()
                               .set('selectedOrg', accessToken && selectedOrg)
                               .set('users', [])
                               .set('involves', new Immutable.List())
-                              .set('pullRequests', [])
+                              .set('pullRequests', new Immutable.List())
                               .set('repositories', [])
                               .set('codeMatches', [])
                               .set('commits',  new Immutable.List())
@@ -43,7 +43,7 @@ const reducers = (state = initialState , action) => {
       return state.set('involves', Immutable.fromJS(action.involves));
 
     case actionTypes.FETCHED_PRs:
-      return state.set('pullRequests', action.pullRequests);
+      return state.set('pullRequests', Immutable.fromJS(action.pullRequests));
       
     case actionTypes.FETCHED_REPOSITORIES:
       return state.set('repositories', action.repositories);
@@ -59,11 +59,10 @@ const reducers = (state = initialState , action) => {
       
    case actionTypes.FETCHED_PR_REVIEWS:
       return state.update('pullRequests', pullRequests => {
-        const index  = pullRequests.findIndex((pr) => pr.number == action.pullRequestNumber &&  pr.head.repo.name === action.repositoryName) 
-        const pr = pullRequests[index];
-        pr.reviews.push(...action.reviews);
-        pullRequests[index] = pr;
-        return [...pullRequests];
+        const index  = pullRequests.findIndex((pr) => pr.get('number') == action.pullRequestNumber &&  pr.getIn(['head','repo','name']) === action.repositoryName) 
+        return pullRequests.update(index, (pr) => {
+          return pr.set('reviews',action.reviews)
+        })
       });
       
     case actionTypes.FETCHED_ORGS: 

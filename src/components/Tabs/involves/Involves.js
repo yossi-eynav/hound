@@ -56,7 +56,7 @@ class Involves extends React.Component {
                 </div>
                 <Filters clearFilters={clearFilters} users={users} filters={filters} repositories={repositories} setFilter={setFilter} />
 
-                <div className="container-involves">
+                <div className="table-container">
                     <Table
                         rowHeight={50}
                         rowsCount={involves.count()}
@@ -122,7 +122,7 @@ class Involves extends React.Component {
                                 </Cell>
                             )} />
 
-   <Column
+                        <Column
                             header={<Cell>Updated At</Cell>}
                             width={200}
                             cell={({rowIndex, props}) => (

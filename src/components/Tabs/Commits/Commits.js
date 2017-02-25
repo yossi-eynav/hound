@@ -43,7 +43,7 @@ class Commits extends React.Component {
                     }.bind(this)} />
                     <FlatButton className="input" onClick={this.getCommits.bind(this)} label="FETCH" />
                 </form>
-                <div className="container-commits">
+                <div className="table-container">
                     <Table
                         rowHeight={50}
                         rowsCount={commits.count()}
