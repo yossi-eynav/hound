@@ -60,13 +60,13 @@ class Involves extends React.Component {
                     <Table
                         rowHeight={50}
                         rowsCount={involves.count()}
-                        width={1750}
+                        width={window.innerWidth}
                         height={1000}
                         headerHeight={50}>
 
                         <Column
                             header={<Cell>Num</Cell>}
-                            width={50}
+                            width={80}
                             cell={({rowIndex, props}) => (
                                 <Cell {...props}>
                                     {rowIndex}
@@ -75,6 +75,7 @@ class Involves extends React.Component {
                         <Column
                             header={<Cell>Title</Cell>}
                             width={700}
+                            flexGrow={4}
                             cell={({rowIndex, props}) => (
                                 <Cell {...props}>
                                     <a href={involves.getIn([rowIndex, 'html_url'])} target="_blank">{involves.getIn([rowIndex, 'title'])}</a>
@@ -83,6 +84,7 @@ class Involves extends React.Component {
                         <Column
                             header={<Cell>Author</Cell>}
                             width={200}
+                            flexGrow={3}
                             cell={({rowIndex, props}) => (
                                 <Cell {...props}>
                                     <Avatar src={involves.getIn([rowIndex, 'user', 'avatar_url'])} />
@@ -93,6 +95,7 @@ class Involves extends React.Component {
                         <Column
                             header={<Cell>Repository Name</Cell>}
                             width={200}
+                            flexGrow={2}
                             cell={({rowIndex, props}) => (
                                 <Cell {...props}>
                                     {involves.getIn([rowIndex, 'repositoryName'])}
@@ -123,7 +126,7 @@ class Involves extends React.Component {
                             )} />
 
                         <Column
-                            header={<Cell>Updated At</Cell>}
+                            header={<Cell>Updated At (relative)</Cell>}
                             width={200}
                             cell={({rowIndex, props}) => (
                                 <Cell {...props}>

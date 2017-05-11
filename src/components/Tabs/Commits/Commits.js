@@ -13,6 +13,7 @@ class Commits extends React.Component {
     getCommits() {
         let since = this.state.since,
             until = this.state.until;
+
         if (since) { since = since.toISOString() }
         if (until) { until = until.toISOString() }
 
@@ -35,10 +36,10 @@ class Commits extends React.Component {
             <div className="commits">
                 <h1> Commits</h1>
                 <form>
-                    <DatePicker className="input" hintText="Since:" container="inline" onChange={function (event, date) {
+                    <DatePicker autoOk={true}  className="input" hintText="Since:" container="inline" onChange={function (event, date) {
                         this.setState({ since: date });
                     }.bind(this)} />
-                    <DatePicker className="input" hintText="Until:" container="inline" onChange={function (event, date) {
+                    <DatePicker autoOk={true} className="input" hintText="Until:" container="inline" onChange={function (event, date) {
                         this.setState({ until: date });
                     }.bind(this)} />
                     <FlatButton className="input" onClick={this.getCommits.bind(this)} label="FETCH" />
@@ -47,7 +48,7 @@ class Commits extends React.Component {
                     <Table
                         rowHeight={50}
                         rowsCount={commits.count()}
-                        width={1450}
+                        width={window.innerWidth}
                         height={1000}
                         headerHeight={50}>
 
@@ -62,6 +63,7 @@ class Commits extends React.Component {
                         <Column
                             header={<Cell>Message</Cell>}
                             width={600}
+                            flexGrow={4}
                             cell={({rowIndex, props}) => (
                                 <Cell {...props}>
                                     <a href={commits.getIn([rowIndex, 'html_url'])} target="_blank">{commits.getIn([rowIndex, 'commit', 'message'])}</a>
@@ -70,6 +72,7 @@ class Commits extends React.Component {
                         <Column
                             header={<Cell>Author</Cell>}
                             width={200}
+                            flexGrow={2}
                             cell={({rowIndex, props}) => (
                                 <Cell {...props}>
                                     <Avatar src={commits.getIn([rowIndex, 'committer', 'avatar_url'])} />
@@ -80,13 +83,14 @@ class Commits extends React.Component {
                         <Column
                             header={<Cell>Repository Name</Cell>}
                             width={200}
+                            flexGrow={2}
                             cell={({rowIndex, props}) => (
                                 <Cell {...props}>
                                     {commits.getIn([rowIndex, 'repository', 'name'])}
                                 </Cell>)} />
 
                         <Column
-                            header={<Cell>Updated At</Cell>}
+                            header={<Cell>Updated At (relative)</Cell>}
                             width={200}
                             cell={({rowIndex, props}) => (
                                 <Cell {...props}>
@@ -97,9 +101,10 @@ class Commits extends React.Component {
                         <Column
                             header={<Cell>Updated At</Cell>}
                             width={200}
+                            flexGrow={3}
                             cell={({rowIndex, props}) => (
                                 <Cell {...props}>
-                                    {moment(commits.getIn([rowIndex, 'commit', 'committer', 'date'])).format('YYYY-MM-DD HH:MM:SS')}
+                                    {moment(commits.getIn([rowIndex, 'commit', 'committer', 'date'])).format('YYYY-MM-DD HH:mm:SS')}
                                 </Cell>
                             )} />
                     </Table>

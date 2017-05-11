@@ -162,7 +162,7 @@ const clearFilters = () => {
     }
 };
 
-const getCommits = (since = moment().add(-10,'days').format(), until = moment().format()) => {
+const getCommits = (since = moment().add(-10,'days').toISOString(), until = moment().toISOString()) => {
     return (dispatch, getState) => {
         dispatch(startFetching());
         const state = getState();

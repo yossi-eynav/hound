@@ -38,6 +38,8 @@ class PullRequest extends React.Component {
         }
     }
 
+
+
     render() {
         const {filters, clearFilters, users, repositories, setFilter} = this.props;
         let pullRequests = this.props.pullRequests;
@@ -56,13 +58,17 @@ class PullRequest extends React.Component {
                     <Table
                         rowHeight={50}
                         rowsCount={pullRequests.count()}
-                        width={1750}
+                        width={window.innerWidth}
                         height={1000}
-                        headerHeight={50}>
+                        headerHeight={50} 
+                        onRowMouseEnter={function (_,rowIndex) {
+                                        if(pullRequests.getIn([rowIndex, 'number','reviews'])) { return; }
 
+                                        this.props.fetchReviews(pullRequests.getIn([rowIndex, 'head', 'repo', 'name']), pullRequests.getIn([rowIndex, 'number']));
+                                    }.bind(this)}>
                         <Column
                             header={<Cell>Num</Cell>}
-                            width={50}
+                            width={80}
                             cell={({rowIndex, props}) => (
                                 <Cell {...props}>
                                     {rowIndex}
@@ -70,6 +76,7 @@ class PullRequest extends React.Component {
 
                         <Column
                             header={<Cell>Author</Cell>}
+                            flexGrow={2}
                             width={200}
                             cell={({rowIndex, props}) => (
                                 <Cell {...props}>
@@ -79,6 +86,7 @@ class PullRequest extends React.Component {
 
                         <Column
                             header={<Cell>Title</Cell>}
+                            flexGrow={4}
                             width={550}
                             cell={({rowIndex, props}) => (
                                 <Cell {...props}>
@@ -90,6 +98,7 @@ class PullRequest extends React.Component {
 
                         <Column
                             header={<Cell>Repository Name</Cell>}
+                            flexGrow={3}
                             width={200}
                             cell={({rowIndex, props}) => (
                                 <Cell {...props}>
@@ -130,18 +139,6 @@ class PullRequest extends React.Component {
                                 </Cell>
                             )} />
 
-
-
-                        <Column
-                            header={<Cell>Actions</Cell>}
-                            width={150}
-                            cell={({rowIndex, props}) => (
-                                <Cell {...props}>
-                                    <FlatButton label="Fetch Reviews" onClick={function () {
-                                        this.props.fetchReviews(pullRequests.getIn([rowIndex, 'head', 'repo', 'name']), pullRequests.getIn([rowIndex, 'number']));
-                                    }.bind(this)} />
-                                </Cell>
-                            )} />
 
                         <Column
                             header={<Cell>Updated At</Cell>}
